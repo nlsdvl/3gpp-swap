@@ -92,8 +92,8 @@ export class SwapServer extends EventEmitter {
     }
   }
 
-  async _ack(ws, msg, status = 200, reason = 'OK') {
-    const resp = new ResponseMessage(msg.message_id, status, reason, null, { source_id: this.serverSource });
+  async _ack(ws, msg) {
+    const resp = new ResponseMessage('ack', msg.source_id, msg.message_id, { source_id: this.serverSource });
     // Only secure if server enabled and sender advertised security support
     const caps = this.registeredEndpoints.get(msg.source_id)?.capabilities;
     const wantsSec = !!caps?.security?.integrity || !!caps?.security?.encryption;
@@ -110,14 +110,14 @@ export class SwapServer extends EventEmitter {
 
   _onRegister(ws, message) {
     console.log('[server] register from', message.source_id);
-    this.registeredEndpoints.set(message.source_id, { ws, criteria: message.criteria, capabilities: message.capabilities || {} });
-    this.matching.register(message.source_id, message.criteria);
+    this.registeredEndpoints.set(message.source_id, { ws, criteria: message.matching_criteria, capabilities: message.capabilities || {} });
+    this.matching.register(message.source_id, message.matching_criteria);
     this._ack(ws, message);
   }
 
   async _onConnect(ws, message) {
     console.log('[server] connect from', message.source_id);
-    const matches = this.matching.findMatches(message.criteria).filter(id => id !== message.source_id);
+    const matches = this.matching.findMatches(message.matching_criteria).filter(id => id !== message.source_id);
     if (!matches.length) return this._sendError(ws, message.message_id, ErrorTypes.TARGET_UNKNOWN, 'No matching endpoint found');
     const selected = this.matching.selectEndpoint(matches);
     const targetSock = this.endpoints.get(selected);
