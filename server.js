@@ -28,7 +28,7 @@ function onKeydown() {
   });
 }
 
-const server = new SwapServer({ port: 8080, host: '0.0.0.0' });
+const server = new SwapServer({ port: 8080, host: '127.0.0.1' });
 const port = await server.start();
 console.log("Press any key to exit.");
 await onKeydown()

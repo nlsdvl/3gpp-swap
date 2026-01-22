@@ -71,11 +71,11 @@ const schemas = {
     properties: {
       ...baseFields,
       offer: { type: 'string', minLength: 1 },
-      criteria: { type: 'array', items: criteriaItem },
+      matching_criteria: { type: 'array', items: criteriaItem },
       security: { type: 'object', nullable: true }
     },
     anyOf: [
-      { required: ['offer', 'criteria'] },
+      { required: ['offer', 'matching_criteria'] },
       { required: ['security'] }
     ]
   },
